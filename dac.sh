@@ -49,3 +49,4 @@ read YN
 if [[ -n $YN && ! $YN =~ "^[Yy]" ]]; then
     exit
 fi
+git push
