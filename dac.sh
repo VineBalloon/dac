@@ -23,6 +23,7 @@ if [[ -n "$TRACKED_FILES" ]]; then
         echo -n "Message to commit $FILE: "
         read MESSAGE
         git commit -m "$MESSAGE"
+        echo "--"
     done
 fi
 
@@ -41,6 +42,7 @@ if [[ -n "$UNTRACKED_FILES" ]]; then
         echo -n "Message to commit $FILE: "
         read MESSAGE
         git commit -m "$MESSAGE"
+        echo "--"
     done
 fi
 
