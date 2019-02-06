@@ -8,6 +8,7 @@ fi
 
 TRACKED_FILES=$(git diff --name-only)
 echo "Tracked files: $TRACKED_FILES"
+echo "--"
 if [[ -n "$TRACKED_FILES" ]]; then
     for FILE in $TRACKED_FILES; do
         git diff $FILE
@@ -29,6 +30,7 @@ fi
 
 UNTRACKED_FILES=($(git ls-files --exclude-standard --others))
 echo "Untracked files: ${UNTRACKED_FILES[@]}"
+echo "--"
 if [[ -n "$UNTRACKED_FILES" ]]; then
     for FILE in ${UNTRACKED_FILES[@]}; do
         echo -n "Would you like to stage $FILE? [Y/n]: "
