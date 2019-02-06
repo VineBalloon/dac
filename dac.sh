@@ -6,35 +6,46 @@ then
     exit
 fi
 
-FILES=$(git diff --name-only)
-if [[ -z "$FILES" ]]
-then
-    >&2 echo "Error: Working Directory is clean!"
-    exit
+TRACKED_FILES=$(git diff --name-only)
+echo "Tracked files: $TRACKED_FILES"
+if [[ -n "$TRACKED_FILES" ]]; then
+    for FILE in $TRACKED_FILES; do
+        git diff $FILE
+
+        echo -n "Would you like to stage $FILE? [Y/n]: "
+        read YN
+        if [[ -n $YN && ! $YN =~ "^[Yy]" ]]; then
+            continue
+        fi
+
+        git add $FILE
+
+        echo -n "Message to commit $FILE: "
+        read MESSAGE
+        git commit -m "$MESSAGE"
+    done
 fi
 
-for FILE in $FILES
-do
-    git diff $FILE
+UNTRACKED_FILES=($(git ls-files --exclude-standard --others))
+echo "Untracked files: ${UNTRACKED_FILES[@]}"
+if [[ -n "$UNTRACKED_FILES" ]]; then
+    for FILE in ${UNTRACKED_FILES[@]}; do
+        echo -n "Would you like to stage $FILE? [Y/n]: "
+        read YN
+        if [[ -n $YN && ! $YN =~ "^[Yy]" ]]; then
+            continue
+        fi
 
-    echo -n "Would you like to stage $FILE? [Y/n]: "
-    read YN
-    if [[ -n $YN && ! $YN =~ "^[Yy]" ]]
-    then
-        continue
-    fi
+        git add $FILE
 
-    git add $FILE
-
-    echo -n "Message to commit $FILE: "
-    read MESSAGE
-    git commit -m "$MESSAGE"
-    sleep 1
-done
+        echo -n "Message to commit $FILE: "
+        read MESSAGE
+        git commit -m "$MESSAGE"
+    done
+fi
 
 echo -n "Would you like to push these changes? [Y/n]: "
 read YN
-if [[ -n $YN && ! $YN =~ "^[Yy]" ]]
-then
+if [[ -n $YN && ! $YN =~ "^[Yy]" ]]; then
     exit
 fi
