@@ -44,6 +44,8 @@ echo "Untracked files: ${UNTRACKED_FILES[@]}"
 echo "--"
 if [[ -n "$UNTRACKED_FILES" ]]; then
     for FILE in ${UNTRACKED_FILES[@]}; do
+        less $FILE
+
         echo -n "Would you like to stage $FILE? [Y/n]: "
         read YN
         if [[ -n $YN && ! $YN =~ "^[Yy]" ]]; then
