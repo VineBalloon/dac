@@ -1,5 +1,13 @@
 #!/bin/bash
 
+read_and_commit() {
+    local MESSAGE=""
+    read -p "Commit Message: " MESSAGE
+    MESSAGE=$(echo $MESSAGE | sed -e "s/^[[:space:]]*//" | sed -e "s/*[[:space:]]$//")
+    MESSAGE=${MESSAGE:-"Minor changes"}
+    git commit -m "$MESSAGE"
+}
+
 if [[ ! $(git rev-parse --is-inside-work-tree) ]]
 then
     # Command already outputs error message to stderr on fail
@@ -17,16 +25,14 @@ fi
 COMMITTED=0
 
 STAGED_FILES=$(git diff --cached --name-only)
-echo "Staged files: $TRACKED_FILES"
+echo "Staged files: $STAGED_FILES"
 echo "--"
 if [[ -n "$STAGED_FILES" ]]; then
     for FILE in $STAGED_FILES; do
         COMMITTED=1
 
-        read -p "Message to commit $FILE: " MESSAGE
-        MESSAGE=$(echo $MESSAGE | sed -e "s/^[[:space:]]*//" | sed -e "s/*[[:space:]]$//")
-        MESSAGE=${MESSAGE:-"Minor fixes"}
-        git commit -m "$MESSAGE"
+        echo "$FILE"
+        read_and_commit
         echo "--"
     done
 fi
@@ -38,7 +44,7 @@ if [[ -n "$TRACKED_FILES" ]]; then
     for FILE in $TRACKED_FILES; do
         git diff $FILE
 
-        read -p "Would you like to stage $FILE? [Y/n]: " YN
+        read -p "Stage $FILE? [Y/n]: " YN
         if [[ -n $YN && ! $YN =~ "^[Yy]" ]]; then
             continue
         fi
@@ -46,10 +52,7 @@ if [[ -n "$TRACKED_FILES" ]]; then
 
         git add $FILE
 
-        read -p "Message to commit $FILE: " MESSAGE
-        MESSAGE=$(echo $MESSAGE | sed -e "s/^[[:space:]]*//" | sed -e "s/*[[:space:]]$//")
-        MESSAGE=${MESSAGE:-"Minor fixes"}
-        git commit -m "$MESSAGE"
+        read_and_commit
         echo "--"
     done
 fi
@@ -69,10 +72,7 @@ if [[ -n "$UNTRACKED_FILES" ]]; then
 
         git add $FILE
 
-        read -p "Enter your Commit Message: " MESSAGE
-        MESSAGE=$(echo $MESSAGE | sed -e "s/^[[:space:]]*//" | sed -e "s/*[[:space:]]$//")
-        MESSAGE=${MESSAGE:-"Minor fixes"}
-        git commit -m "$MESSAGE"
+        read_and_commit
         echo "--"
     done
 fi
@@ -82,7 +82,7 @@ if [[ $COMMITTED == 0 ]]; then
     exit
 fi
 
-read -p "Would you like to push these changes? [Y/n]: " YN
+read -p "Push? [Y/n]: " YN
 if [[ -n $YN && ! $YN =~ "^[Yy]" ]]; then
     echo "Bye"
     exit
