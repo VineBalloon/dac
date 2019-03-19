@@ -16,6 +16,21 @@ fi
 # Committed flag
 COMMITTED=0
 
+STAGED_FILES=$(git diff --cached --name-only)
+echo "Staged files: $TRACKED_FILES"
+echo "--"
+if [[ -n "$STAGED_FILES" ]]; then
+    for FILE in $STAGED_FILES; do
+        COMMITTED=1
+
+        read -p "Message to commit $FILE: " MESSAGE
+        MESSAGE=$(echo $MESSAGE | sed -e "s/^[[:space:]]*//" | sed -e "s/*[[:space:]]$//")
+        MESSAGE=${MESSAGE:-"Minor fixes"}
+        git commit -m "$MESSAGE"
+        echo "--"
+    done
+fi
+
 TRACKED_FILES=$(git diff --name-only)
 echo "Tracked files: $TRACKED_FILES"
 echo "--"
