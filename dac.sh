@@ -23,8 +23,7 @@ if [[ -n "$TRACKED_FILES" ]]; then
     for FILE in $TRACKED_FILES; do
         git diff $FILE
 
-        echo -n "Would you like to stage $FILE? [Y/n]: "
-        read YN
+        read -p "Would you like to stage $FILE? [Y/n]: " YN
         if [[ -n $YN && ! $YN =~ "^[Yy]" ]]; then
             continue
         fi
@@ -32,8 +31,9 @@ if [[ -n "$TRACKED_FILES" ]]; then
 
         git add $FILE
 
-        echo -n "Message to commit $FILE: "
-        read MESSAGE
+        read -p "Message to commit $FILE: " MESSAGE
+        MESSAGE=$(echo $MESSAGE | sed -e "s/^[[:space:]]*//" | sed -e "s/*[[:space:]]$//")
+        MESSAGE=${MESSAGE:-"Minor fixes"}
         git commit -m "$MESSAGE"
         echo "--"
     done
@@ -46,8 +46,7 @@ if [[ -n "$UNTRACKED_FILES" ]]; then
     for FILE in ${UNTRACKED_FILES[@]}; do
         less $FILE
 
-        echo -n "Would you like to stage $FILE? [Y/n]: "
-        read YN
+        read -p "Stage $FILE? [Y/n]: " YN
         if [[ -n $YN && ! $YN =~ "^[Yy]" ]]; then
             continue
         fi
@@ -55,8 +54,9 @@ if [[ -n "$UNTRACKED_FILES" ]]; then
 
         git add $FILE
 
-        echo -n "Message to commit $FILE: "
-        read MESSAGE
+        read -p "Enter your Commit Message: " MESSAGE
+        MESSAGE=$(echo $MESSAGE | sed -e "s/^[[:space:]]*//" | sed -e "s/*[[:space:]]$//")
+        MESSAGE=${MESSAGE:-"Minor fixes"}
         git commit -m "$MESSAGE"
         echo "--"
     done
@@ -67,8 +67,7 @@ if [[ $COMMITTED == 0 ]]; then
     exit
 fi
 
-echo -n "Would you like to push these changes? [Y/n]: "
-read YN
+read -p "Would you like to push these changes? [Y/n]: " YN
 if [[ -n $YN && ! $YN =~ "^[Yy]" ]]; then
     echo "Bye"
     exit
